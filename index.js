@@ -45,6 +45,11 @@ const upload = multer({ storage: storage });
 // Routes - only cube routes, no auth routes
 app.use('/api/cube', cubeRoutes);
 
+// Add a dedicated health check endpoint
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok' });
+});
+
 // Upload endpoint for single image
 app.post('/api/upload', upload.single('image'), (req, res) => {
     if (!req.file) {
@@ -61,12 +66,23 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Serve the static test page
-app.use('/test', express.static(path.join(__dirname, 'public')));
+// Serve the static test page if public folder exists
+const publicDir = path.join(__dirname, 'public');
+if (fs.existsSync(publicDir)) {
+    app.use('/test', express.static(publicDir));
+} else {
+    app.get('/test', (req, res) => {
+        res.send('Test page would be here if public directory existed.');
+    });
+}
 
-// Add a root redirect to the test page
+// Add a root redirect to the health check when in production
 app.get('/', (req, res) => {
-    res.redirect('/test');
+    if (process.env.NODE_ENV === 'production') {
+        res.redirect('/health');
+    } else {
+        res.redirect('/test');
+    }
 });
 
 // Start server
