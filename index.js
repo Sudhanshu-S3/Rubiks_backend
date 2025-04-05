@@ -20,7 +20,11 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-    origin: ['http://localhost:3000', process.env.CLIENT_URL],
+    origin: [
+        'http://localhost:3000',
+        'https://rubiks-client.vercel.app',
+        process.env.CLIENT_URL
+    ].filter(Boolean),
     credentials: true
 }));
 app.use(express.json());
