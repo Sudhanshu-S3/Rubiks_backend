@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-    origin: ['https://your-vercel-app.vercel.app', 'http://localhost:3000', process.env.CLIENT_URL],
+    origin: ['http://localhost:3000', process.env.CLIENT_URL],
     credentials: true
 }));
 app.use(express.json());
@@ -69,9 +69,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Serve the static test page if public folder exists
 const publicDir = path.join(__dirname, 'public');
 if (fs.existsSync(publicDir)) {
-    app.use('/test', express.static(publicDir));
+    app.use('/', express.static(publicDir));
 } else {
-    app.get('/test', (req, res) => {
+    app.get('/', (req, res) => {
         res.send('Test page would be here if public directory existed.');
     });
 }
@@ -81,14 +81,14 @@ app.get('/', (req, res) => {
     if (process.env.NODE_ENV === 'production') {
         res.redirect('/health');
     } else {
-        res.redirect('/test');
+        res.redirect('/');
     }
 });
 
 // Start server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`Visit http://localhost:${PORT}/test to test the solver`);
+    console.log(`Visit http://localhost:${PORT}/ to test the solver`);
 });
 
 // Clean up uploads directory every hour

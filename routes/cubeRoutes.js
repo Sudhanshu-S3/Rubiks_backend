@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { GoogleGenerativeAI } = require("@google/generative-ai"); // Add this import
 const cubeController = require('../controllers/cubeController');
-const auth = require('../middleware/auth');
 const multer = require('multer');
 const path = require('path');
 
@@ -41,24 +40,5 @@ router.post('/solve', cubeController.solveCube);
 router.post('/compile', cubeController.compileCubeState);
 
 // Add this route for testing the API connection
-router.get('/test-gemini', async (req, res) => {
-    try {
-        if (!process.env.GEMINI_API_KEY) {
-            return res.json({ success: false, message: 'GEMINI_API_KEY not set in environment variables' });
-        }
-
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-        const result = await model.generateContent("What's the standard color scheme for a Rubik's cube?");
-        const response = await result.response;
-        const text = response.text();
-
-        return res.json({ success: true, message: 'API connection successful', response: text });
-    } catch (error) {
-        console.error('Error testing Gemini API:', error);
-        return res.status(500).json({ success: false, message: error.message });
-    }
-});
 
 module.exports = router;
